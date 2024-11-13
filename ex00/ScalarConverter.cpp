@@ -6,7 +6,7 @@
 /*   By: dolifero <dolifero@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/12 15:19:39 by dolifero          #+#    #+#             */
-/*   Updated: 2024/11/12 17:15:15 by dolifero         ###   ########.fr       */
+/*   Updated: 2024/11/13 15:30:39 by dolifero         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,11 +33,29 @@ ScalarConverter &ScalarConverter::operator=(const ScalarConverter &other)
 	return *this;
 }
 
+std::string format_float(float value, int precision)
+{
+	std::ostringstream oss;
+	oss << std::fixed << std::setprecision(precision) << value;
+	return oss.str() + "f";
+}
+
+std::string format_double(double value, int precision)
+{
+	std::ostringstream oss;
+	oss << std::fixed << std::setprecision(precision) << value;
+	return oss.str();
+}
+
 bool isIntOverflow(std::string str)
 {
-	if(str.length() > 10)
+	int length = str.length();
+
+	if(str[0] == '-' || str[0] == '+')
+		length--;
+	if(length > 10)
 		return true;
-	if(str.length() == 10)
+	if(length == 10)
 	{
 		if(str[0] == '-' && str > "-2147483648")
 			return true;
@@ -58,6 +76,8 @@ bool isNum(std::string str)
 		if(str[i] == '.')
 		{
 			if(dot)
+				return false;
+			if(str[i + 1] == 'f')
 				return false;
 			dot = true;
 			i++;
@@ -98,6 +118,8 @@ void print_out(std::string c, std::string i, std::string f, std::string d)
 {
 	if(c[0] < 32 || c[0] > 126)
 		std::cout << "char: Non displayable" << std::endl;
+	else if (c.length() == 1)
+		std::cout << "char: '" << c << "'" << std::endl;
 	else
 		std::cout << "char: " << c << std::endl;
 	std::cout << "int: " << i << std::endl;
@@ -119,7 +141,7 @@ void print_converted(std::string str, std::string type)
 		int i = static_cast<int>(str[0]);
 		float f = static_cast<float>(i);
 		double d = static_cast<double>(i);
-		print_out(str, std::to_string(i), std::to_string(f) + "f", std::to_string(d));
+		print_out(str, std::to_string(i), format_float(f, 1), format_double(d, 1));
 	}
 	if(type == "int")
 	{
@@ -132,7 +154,7 @@ void print_converted(std::string str, std::string type)
 			float f = static_cast<float>(i);
 			double d = static_cast<double>(i);
 			print_out( d < 0 || d > 255 ? "Impossible" : std::string(1, c),
-				isIntOverflow(str) ? "Impossible" : std::to_string(i), std::to_string(f) + "f", std::to_string(d));
+				isIntOverflow(str) ? "Impossible" : std::to_string(i), format_float(f, 1), format_double(d, 1));
 		}
 	}
 	if(type == "double")
@@ -142,7 +164,7 @@ void print_converted(std::string str, std::string type)
 		char c = static_cast<char>(i);
 		float f = static_cast<float>(d);
 		print_out( d < 0 || d > 255 ? "Impossible" : std::string(1, c),
-			isIntOverflow(str) ? "Impossible" : std::to_string(i), std::to_string(f) + "f", std::to_string(d));
+			isIntOverflow(str) ? "Impossible" : std::to_string(i), format_float(f, 7), format_double(d, 15));
 	}
 	if(type == "float")
 	{
@@ -151,7 +173,7 @@ void print_converted(std::string str, std::string type)
 		char c = static_cast<char>(i);
 		double d = static_cast<double>(f);
 		print_out(f < 0 || f > 255 ? "Impossible" : std::string(1, c),
-			isIntOverflow(str) ? "Impossible" : std::to_string(i), std::to_string(f) + "f", std::to_string(d));
+			isIntOverflow(str) ? "Impossible" : std::to_string(i), format_float(f, 7), format_double(d, 7));
 	}
 	if(type == "invalid")
 		std::cout << "Invalid input" << std::endl;
@@ -160,6 +182,6 @@ void print_converted(std::string str, std::string type)
 void ScalarConverter::convert(std::string str)
 {
 	std::string type = get_type(str);
-	std::cout << "Type: " << type << std::endl;
+	// std::cout << "Type: " << type << std::endl;
 	print_converted(str, type);
 }
