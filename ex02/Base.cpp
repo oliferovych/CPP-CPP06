@@ -6,7 +6,7 @@
 /*   By: dolifero <dolifero@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/14 22:47:38 by dolifero          #+#    #+#             */
-/*   Updated: 2024/11/14 23:17:26 by dolifero         ###   ########.fr       */
+/*   Updated: 2024/11/14 23:23:45 by dolifero         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,12 +32,12 @@ Base *generate(void)
 
 	switch (random)
 	{
-		case 1:
-			return new A();
-		case 2:
-			return new B();
-		default:
-			return new C();
+	case 1:
+		return new A();
+	case 2:
+		return new B();
+	default:
+		return new C();
 	}
 }
 
@@ -48,11 +48,11 @@ void identify(Base *p)
 	C *c_ptr;
 
 	std::cout << "Pointer type: ";
-	if((a_ptr = dynamic_cast<A *>(p)))
+	if ((a_ptr = dynamic_cast<A *>(p)))
 		std::cout << "A" << std::endl;
-	else if((b_ptr = dynamic_cast<B *>(p)))
+	else if ((b_ptr = dynamic_cast<B *>(p)))
 		std::cout << "B" << std::endl;
-	else if((c_ptr = dynamic_cast<C *>(p)))
+	else if ((c_ptr = dynamic_cast<C *>(p)))
 		std::cout << "C" << std::endl;
 	else
 		std::cout << "Unknown" << std::endl;
@@ -60,17 +60,24 @@ void identify(Base *p)
 
 void identify(Base &p)
 {
-	A *a_ptr;
-	B *b_ptr;
-	C *c_ptr;
-
 	std::cout << "Reference type: ";
-	if((a_ptr = dynamic_cast<A *>(&p)))
+	try
+	{
+		(void)dynamic_cast<A &>(p);
 		std::cout << "A" << std::endl;
-	else if((b_ptr = dynamic_cast<B *>(&p)))
-		std::cout << "B" << std::endl;
-	else if((c_ptr = dynamic_cast<C *>(&p)))
-		std::cout << "C" << std::endl;
-	else
-		std::cout << "Unknown" << std::endl;
+	}catch (const std::bad_cast &){
+		try
+		{
+			(void)dynamic_cast<B &>(p);
+			std::cout << "B" << std::endl;
+		}catch (const std::bad_cast &){
+			try
+			{
+				(void)dynamic_cast<C &>(p);
+				std::cout << "C" << std::endl;
+			}catch (const std::bad_cast &){
+				std::cout << "Unknown" << std::endl;
+			}
+		}
+	}
 }
